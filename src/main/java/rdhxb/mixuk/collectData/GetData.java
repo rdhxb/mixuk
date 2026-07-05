@@ -13,7 +13,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,11 +28,23 @@ public class GetData {
     private final ObjectMapper mapper = new ObjectMapper();
     private final MixService service;
 
+//   today until +2 days. Runs daily using CRON at 00:00 to collect 3 days of data.
+    private LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC);;
+    private LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC).plusDays(2);
+
 
     public void getData() throws IOException, InterruptedException {
 
+//        format dateTime to match API date format API expects ISO 8601 format with 'Z' suffix (UTC)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
+        String fromStr = from.format(formatter);
+        String toStr = to.format(formatter);
+
+//        Create URL to API
+        String URL = "https://api.carbonintensity.org.uk/generation/" + fromStr + "/" + toStr;
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.carbonintensity.org.uk/generation/2026-01-20T12:00Z/2026-01-20T12:30Z"))
+                .uri(URI.create(URL))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -37,16 +52,18 @@ public class GetData {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         JsonNode mixes = mapper.readTree(response.body());
-        JsonNode mixesData = mixes.path("data");
 
+//        get to data root in json tree
+        JsonNode mixesData = mixes.path("data");
 
 
         ArrayList<Interval> intervals = new ArrayList<>();
 
+//        go through response tree to create intervals that we define in entity Interval
         for (JsonNode mix : mixesData){
             JsonNode genMix = mix.path("generationmix");
-            Interval interval = new Interval();
 
+            Interval interval = new Interval();
             interval.setFrom(OffsetDateTime.parse(mix.path("from").asString()).toLocalDateTime());
             interval.setTo(OffsetDateTime.parse(mix.path("to").asString()).toLocalDateTime());
 
@@ -64,11 +81,13 @@ public class GetData {
         }
 
 
+//        save all data to database could be faster. Is n + 1, but we got not that many data only 3 days shouldn't be a big deal
         service.saveData(intervals);
 
 
     }
 
+//    get percent from the json tree going through generationMix -> fuel (biomass) -> perc
     private static double getPct(JsonNode generationMix, String fuel){
         for (JsonNode entry : generationMix){
             if (entry.path("fuel").asString().equals(fuel)){
