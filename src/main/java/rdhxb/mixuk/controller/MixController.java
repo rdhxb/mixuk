@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rdhxb.mixuk.entity.CleanEnergy;
 import rdhxb.mixuk.entity.DayTotal;
 import rdhxb.mixuk.service.MixService;
 
@@ -19,6 +20,11 @@ public class MixController {
     @GetMapping("/dayMix")
     public List<DayTotal> getDatyTotalMix(){
         return service.groupIntervals();
+    }
+
+    @GetMapping("/cleanIntervals")
+    public List<CleanEnergy> getCleanIntervals(){
+        return service.getCleanIntervals();
     }
 
 

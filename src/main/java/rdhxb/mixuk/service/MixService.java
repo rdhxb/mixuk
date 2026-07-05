@@ -24,6 +24,10 @@ public class MixService {
         return repo.groupIntervals();
     }
 
+    public List<CleanEnergy> getCleanIntervals(){
+        return repo.findCleanEnergy();
+    }
+
 
 
 
