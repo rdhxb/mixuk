@@ -29,8 +29,8 @@ public class GetData {
     private final MixService service;
 
 //   today until +2 days. Runs daily using CRON at 00:00 to collect 3 days of data.
-    private LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC);;
-    private LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC).plusDays(2);
+    private LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay();
+    private LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC).plusDays(3).toLocalDate().atStartOfDay();
 
 
     public void getData() throws IOException, InterruptedException {
@@ -61,6 +61,12 @@ public class GetData {
 
 //        go through response tree to create intervals that we define in entity Interval
         for (JsonNode mix : mixesData){
+            LocalDateTime intervalFrom = OffsetDateTime.parse(mix.path("from").asString()).toLocalDateTime();
+
+            if (intervalFrom.isBefore(from)) {
+                continue;
+            }
+
             JsonNode genMix = mix.path("generationmix");
 
             Interval interval = new Interval();
