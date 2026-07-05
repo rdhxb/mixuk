@@ -2,6 +2,7 @@ package rdhxb.mixuk.service;
 
 import lombok.RequiredArgsConstructor;
 import rdhxb.mixuk.entity.CleanEnergy;
+import rdhxb.mixuk.entity.DayTotal;
 import rdhxb.mixuk.entity.Interval;
 import rdhxb.mixuk.repo.MixRepo;
 
@@ -17,6 +18,13 @@ public class MixService {
     public void saveData(List<Interval> intervals){
         repo.saveAll(intervals);
     }
+
+
+    public List<DayTotal> groupIntervals(){
+        return repo.groupIntervals();
+    }
+
+
 
 
 }
