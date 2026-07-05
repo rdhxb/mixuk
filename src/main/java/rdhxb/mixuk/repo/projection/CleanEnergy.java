@@ -1,4 +1,4 @@
-package rdhxb.mixuk.entity;
+package rdhxb.mixuk.repo.projection;
 
 import java.time.LocalDateTime;
 

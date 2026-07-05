@@ -2,8 +2,8 @@ package rdhxb.mixuk.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import rdhxb.mixuk.entity.CleanEnergy;
-import rdhxb.mixuk.entity.DayTotal;
+import rdhxb.mixuk.repo.projection.CleanEnergy;
+import rdhxb.mixuk.repo.projection.DayTotal;
 import rdhxb.mixuk.entity.Interval;
 
 import java.util.List;
