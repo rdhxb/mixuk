@@ -1,11 +1,15 @@
 package rdhxb.mixuk.service;
 
 import lombok.RequiredArgsConstructor;
-import rdhxb.mixuk.entity.CleanEnergy;
-import rdhxb.mixuk.entity.DayTotal;
+import rdhxb.mixuk.repo.projection.CleanEnergy;
+import rdhxb.mixuk.repo.projection.DayTotal;
 import rdhxb.mixuk.entity.Interval;
+import rdhxb.mixuk.dto.OptimalWindow;
 import rdhxb.mixuk.repo.MixRepo;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -26,6 +30,41 @@ public class MixService {
 
     public List<CleanEnergy> getCleanIntervals(){
         return repo.findCleanEnergy();
+    }
+
+
+//    Sliding window algorithm to calculate best window for user with most amount of clear energy
+    public OptimalWindow optimalCleanWindow(int hours) {
+        List<CleanEnergy> cleanEnergies = getCleanIntervals();
+
+        int intervals = hours * 2;
+        double max = -1;
+        double avg = 0.0;
+        List<CleanEnergy> bestWindow = new ArrayList<>();
+
+        for (int i = 0; i <= cleanEnergies.size() - intervals; i++) {
+            double cleanSum = 0.0;
+            List<CleanEnergy> cleanWindow = new ArrayList<>();
+
+            for (int k = i; k < i + intervals; k++) {
+                cleanSum += cleanEnergies.get(k).getCleanEnergy();
+                cleanWindow.add(cleanEnergies.get(k));
+            }
+
+            if (cleanSum > max && !cleanWindow.get(0).getFromTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                max = cleanSum;
+                bestWindow = cleanWindow;
+                avg = max / intervals;
+            }
+        }
+
+        OptimalWindow optimalWindow = new OptimalWindow();
+        optimalWindow.setFromDate(bestWindow.getFirst().getFromTime());
+        optimalWindow.setToDate(bestWindow.getLast().getToTime());
+        optimalWindow.setAvgCleanEnergy(avg);
+
+
+        return optimalWindow;
     }
 
 
