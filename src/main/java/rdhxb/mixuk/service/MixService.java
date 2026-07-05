@@ -1,6 +1,7 @@
 package rdhxb.mixuk.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import rdhxb.mixuk.repo.projection.CleanEnergy;
 import rdhxb.mixuk.repo.projection.DayTotal;
 import rdhxb.mixuk.entity.Interval;
@@ -12,7 +13,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
 public class MixService {
 
@@ -35,7 +36,7 @@ public class MixService {
 
 //    Sliding window algorithm to calculate best window for user with most amount of clear energy
     public OptimalWindow optimalCleanWindow(int hours) {
-        List<CleanEnergy> cleanEnergies = getCleanIntervals();
+        List<CleanEnergy> cleanEnergies = repo.findCleanEnergy();
 
         int intervals = hours * 2;
         double max = -1;
@@ -51,11 +52,16 @@ public class MixService {
                 cleanWindow.add(cleanEnergies.get(k));
             }
 
+//            starting time must be in the future
             if (cleanSum > max && !cleanWindow.get(0).getFromTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                 max = cleanSum;
                 bestWindow = cleanWindow;
                 avg = max / intervals;
             }
+        }
+
+        if (bestWindow.isEmpty()){
+            return null;
         }
 
         OptimalWindow optimalWindow = new OptimalWindow();
