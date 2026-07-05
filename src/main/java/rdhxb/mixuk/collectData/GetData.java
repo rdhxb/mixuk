@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -44,27 +45,25 @@ public class GetData {
 
         for (JsonNode mix : mixesData){
             JsonNode genMix = mix.path("generationmix");
-            Interval interval = new Interval(
-                    null,
-                    mix.path("from").asString(),
-                    mix.path("to").asString(),
-                    getPct(genMix, "biomass"),
-                    getPct(genMix, "coal"),
-                    getPct(genMix, "imports"),
-                    getPct(genMix, "gas"),
-                    getPct(genMix, "nuclear"),
-                    getPct(genMix, "other"),
-                    getPct(genMix, "hydro"),
-                    getPct(genMix, "solar"),
-                    getPct(genMix, "wind")
-            );
+            Interval interval = new Interval();
+
+            interval.setFrom(OffsetDateTime.parse(mix.path("from").asString()).toLocalDateTime());
+            interval.setTo(OffsetDateTime.parse(mix.path("to").asString()).toLocalDateTime());
+
+            interval.setBiomass_pct(getPct(genMix, "biomass"));
+            interval.setCoal_pct(getPct(genMix, "coal"));
+            interval.setImports_pct(getPct(genMix, "imports"));
+            interval.setGas_pct(getPct(genMix, "gas"));
+            interval.setNuclear_pct(getPct(genMix, "nuclear"));
+            interval.setOther_pct(getPct(genMix, "other"));
+            interval.setHydro_pct(getPct(genMix, "hydro"));
+            interval.setSolar_pct(getPct(genMix, "solar"));
+            interval.setWind_pct(getPct(genMix, "wind"));
 
             intervals.add(interval);
-            System.out.println(interval);
         }
 
 
-//        System.out.println(intervals);
         service.saveData(intervals);
 
 

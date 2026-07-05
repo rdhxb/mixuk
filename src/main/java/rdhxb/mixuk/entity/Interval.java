@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -19,9 +20,9 @@ public class Interval {
     private Long id;
 
     @Column(name = "from_time")
-    private String from;
+    private LocalDateTime from;
     @Column(name = "to_time")
-    private String to;
+    private LocalDateTime to;
     private Double biomass_pct;
     private Double coal_pct;
     private Double imports_pct;
