@@ -1,7 +1,12 @@
 package rdhxb.mixuk;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import rdhxb.mixuk.collectData.GetData;
+import rdhxb.mixuk.repo.MixRepo;
+
 
 @SpringBootApplication
 public class MixukApplication {
@@ -10,4 +15,13 @@ public class MixukApplication {
 		SpringApplication.run(MixukApplication.class, args);
 	}
 
+	@Bean
+	CommandLineRunner runDataCollector(GetData getData, MixRepo repo){
+		return args -> {
+			if (repo.count() == 0){
+				getData.getData();
+			}
+		};
+
+	}
 }
