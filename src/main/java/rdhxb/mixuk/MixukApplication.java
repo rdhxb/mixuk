@@ -21,7 +21,7 @@ public class MixukApplication {
 	CommandLineRunner runDataCollector(GetData getData, MixRepo repo){
 		return args -> {
 			if (repo.count() == 0){
-				getData.getData();
+				getData.scheduleDataCollection();
 			}
 		};
 
