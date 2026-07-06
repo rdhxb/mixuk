@@ -4,11 +4,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import rdhxb.mixuk.collectData.GetData;
 import rdhxb.mixuk.repo.MixRepo;
 
 
 @SpringBootApplication
+@EnableScheduling
 public class MixukApplication {
 
 	public static void main(String[] args) {

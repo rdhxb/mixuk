@@ -1,8 +1,9 @@
 package rdhxb.mixuk.collectData;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import rdhxb.mixuk.entity.Interval;
 import rdhxb.mixuk.service.MixService;
 import tools.jackson.databind.JsonNode;
@@ -18,22 +19,22 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class GetData {
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
     private final MixService service;
 
-//   today until +2 days. Runs daily using CRON at 00:00 to collect 3 days of data.
-    private LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay();
-    private LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC).plusDays(3).toLocalDate().atStartOfDay();
-
-
     public void getData() throws IOException, InterruptedException {
+
+//       today until +2 days. Runs daily using CRON at 00:00 to collect 3 days of data.
+        LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay();
+        LocalDateTime to = LocalDateTime.now(ZoneOffset.UTC).plusDays(3).toLocalDate().atStartOfDay();
+
 
 //        format dateTime to match API date format API expects ISO 8601 format with 'Z' suffix (UTC)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
@@ -91,6 +92,16 @@ public class GetData {
         service.saveData(intervals);
 
 
+    }
+    @Scheduled(cron = "0 5 0 * * *", zone = "UTC")
+    public void scheduleDataCollection(){
+        log.info("Data collection started");
+        try {
+            getData();
+            log.info("Data collection finished successfully");
+        }catch (Exception e){
+            log.error("Failed to collect data", e);
+        }
     }
 
 //    get percent from the json tree going through generationMix -> fuel (biomass) -> perc
