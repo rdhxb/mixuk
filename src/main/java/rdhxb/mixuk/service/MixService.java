@@ -28,6 +28,11 @@ public class MixService {
         repo.saveAll(intervals);
     }
 
+    @Transactional
+    public void deleteData(){
+        repo.deleteAll();
+    }
+
 
     public List<DayTotal> groupIntervals(){
         return repo.groupIntervals();

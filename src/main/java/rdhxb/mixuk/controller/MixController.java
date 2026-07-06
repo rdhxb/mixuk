@@ -25,10 +25,6 @@ public class MixController {
         return service.groupIntervals();
     }
 
-    @GetMapping("/cleanIntervals")
-    public List<CleanEnergy> getCleanIntervals(){
-        return service.getCleanIntervals();
-    }
 
     @GetMapping("/window")
     public OptimalWindow getWindow(@RequestParam @Min(1) @Max(6) int hours){

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import rdhxb.mixuk.entity.Interval;
+import rdhxb.mixuk.repo.MixRepo;
 import rdhxb.mixuk.service.MixService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -28,8 +31,9 @@ public class GetData {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
     private final MixService service;
+    private final MixRepo repo;
 
-    public void getData() throws IOException, InterruptedException {
+    public List<Interval> getData() throws IOException, InterruptedException {
 
 //       today until +2 days. Runs daily using CRON at 00:00 to collect 3 days of data.
         LocalDateTime from = LocalDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay();
@@ -87,22 +91,26 @@ public class GetData {
             intervals.add(interval);
         }
 
-
-//        save all data to database could be faster. Is n + 1, but we got not that many data only 3 days shouldn't be a big deal
-        service.saveData(intervals);
-
+        return intervals;
 
     }
     @Scheduled(cron = "0 5 0 * * *", zone = "UTC")
-    public void scheduleDataCollection(){
+    public void scheduleDataCollection() {
         log.info("Data collection started");
         try {
-            getData();
-            log.info("Data collection finished successfully");
-        }catch (Exception e){
-            log.error("Failed to collect data", e);
+            List<Interval> fresh = getData();
+            if (fresh.isEmpty()) {
+                log.warn("Empty response, keeping old data");
+                return;
+            }
+            service.deleteData();
+            service.saveData(fresh);
+            log.info("Data collection finished, saved {} intervals", fresh.size());
+        } catch (Exception e) {
+            log.error("Failed to collect data, keeping old data", e);
         }
     }
+
 
 //    get percent from the json tree going through generationMix -> fuel (biomass) -> perc
     private static double getPct(JsonNode generationMix, String fuel){
