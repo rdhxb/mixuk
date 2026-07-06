@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
+
 
 import java.time.LocalDateTime;
 
@@ -19,7 +19,7 @@ public class Interval {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "from_time")
+    @Column(name = "from_time", unique = true)
     private LocalDateTime from;
     @Column(name = "to_time")
     private LocalDateTime to;
