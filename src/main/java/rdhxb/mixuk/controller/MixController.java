@@ -1,6 +1,9 @@
 package rdhxb.mixuk.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rdhxb.mixuk.repo.projection.CleanEnergy;
 import rdhxb.mixuk.repo.projection.DayTotal;
@@ -12,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Validated
 public class MixController {
 
     private final MixService service;
@@ -27,7 +31,7 @@ public class MixController {
     }
 
     @GetMapping("/window")
-    public OptimalWindow getWindow(@RequestParam int hours){
+    public OptimalWindow getWindow(@RequestParam @Min(1) @Max(6) int hours){
         return service.optimalCleanWindow(hours);
     }
 
