@@ -1,12 +1,15 @@
 package rdhxb.mixuk.service;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rdhxb.mixuk.repo.projection.CleanEnergy;
 import rdhxb.mixuk.repo.projection.DayTotal;
 import rdhxb.mixuk.entity.Interval;
 import rdhxb.mixuk.dto.OptimalWindow;
 import rdhxb.mixuk.repo.MixRepo;
+
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -20,6 +23,7 @@ public class MixService {
     private final MixRepo repo;
 
 
+    @Transactional
     public void saveData(List<Interval> intervals){
         repo.saveAll(intervals);
     }

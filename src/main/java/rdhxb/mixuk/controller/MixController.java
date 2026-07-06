@@ -1,10 +1,7 @@
 package rdhxb.mixuk.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import rdhxb.mixuk.repo.projection.CleanEnergy;
 import rdhxb.mixuk.repo.projection.DayTotal;
 import rdhxb.mixuk.dto.OptimalWindow;
@@ -29,8 +26,8 @@ public class MixController {
         return service.getCleanIntervals();
     }
 
-    @GetMapping("/window/{hours}")
-    public OptimalWindow getWindow(@PathVariable int hours){
+    @GetMapping("/window")
+    public OptimalWindow getWindow(@RequestParam int hours){
         return service.optimalCleanWindow(hours);
     }
 
