@@ -36,7 +36,7 @@ docker run -p 8080:8080 -e DB_USERNAME=... -e DB_PASSWORD=... mixuk
 
 ## Deploy
 
-Wdrożone na Renderze: [link po deployu]
+Wdrożone na Renderze: https://mixuk-front.onrender.com
 
 Zmienne środowiskowe wymagane na produkcji:
 - `DATABASE_URL` — pełny JDBC URL Postgresa
