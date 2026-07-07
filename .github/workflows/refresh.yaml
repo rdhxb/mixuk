@@ -1,0 +1,23 @@
+name: Refresh mixuk backend
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'   
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake up backend
+        run: curl -sS -o /dev/null https://mixuk-backend.onrender.com/ || true
+
+      - name: Wait for cold start
+        run: sleep 180
+
+      - name: POST /api/refresh
+        run: |
+          curl -sS -X POST https://mixuk-backend.onrender.com/api/refresh \
+            -H "X-Token: ${{ secrets.REFRESH_TOKEN }}" \
+            --max-time 60 \
+            --fail --show-error
